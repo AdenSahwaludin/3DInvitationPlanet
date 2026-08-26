@@ -5,6 +5,7 @@ import { clamp, damp, lerp } from '../core/tween.js';
 
 const tmpA = new THREE.Vector3();
 const tmpB = new THREE.Vector3();
+const tmpC = new THREE.Vector3();
 
 export const cameraRig = {
   cam: null,
@@ -92,24 +93,32 @@ export const cameraRig = {
       this.curLook.lerp(desiredLook, 1 - Math.exp(-dt * 2.4));
     } else {
       const yaw = rocket.yaw + this.yawOff;
-      const pitch = 0.34 + this.pitchOff;
+      const pitch = clamp(0.34 + this.pitchOff, -0.06, 1.25);
       desired.set(
         rocket.pos.x - Math.sin(yaw) * Math.cos(pitch) * this.dist,
         rocket.pos.y + Math.sin(pitch) * this.dist,
         rocket.pos.z - Math.cos(yaw) * Math.cos(pitch) * this.dist
       );
+
+      const toRx = (rocket.pos.x - desired.x) / this.dist;
+      const toRz = (rocket.pos.z - desired.z) / this.dist;
+      const lead = this.dist * 0.26;
       desiredLook.set(
-        rocket.pos.x + Math.sin(rocket.yaw) * 7,
-        rocket.pos.y + 1.1 + parallaxY * 0.6,
-        rocket.pos.z + Math.cos(rocket.yaw) * 7
+        rocket.pos.x + toRx * lead,
+        rocket.pos.y + 1.0 + parallaxY * 0.5 + this.pitchOff * 1.6,
+        rocket.pos.z + toRz * lead
       );
-      desired.y += parallaxY;
+
+      const overviewK = clamp((this.dist - 60) / 60, 0, 1);
+      if (overviewK > 0) {
+        tmpC.set(rocket.pos.x * 0.65, rocket.pos.y, rocket.pos.z * 0.65);
+        desiredLook.lerp(tmpC, overviewK * 0.5);
+      }
+
+      desired.y += parallaxY * 0.5;
       const lag = 1 - Math.exp(-dt * (state.mode === 'launching' ? 1.6 : 3.4));
       this.curPos.lerp(desired, lag);
       this.curLook.lerp(desiredLook, 1 - Math.exp(-dt * 5));
-
-      const overviewK = clamp((this.dist - 60) / 60, 0, 1);
-      if (overviewK > 0) desiredLook.lerp(rocket.pos.clone().lerp(new THREE.Vector3(0, 0, 0), 0.35 * overviewK), overviewK * 0.5);
     }
 
     this.shake = damp(this.shake, (speedNorm * 0.05 + (boostOn ? 0.05 : 0)), 4, dt);

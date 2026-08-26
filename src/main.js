@@ -270,5 +270,11 @@ function boostActive() {
   return player.thrSm > 0.85;
 }
 
-window.__odyssey = { state, PLANETS, player, rocket };
+window.__odyssey = {
+  state, PLANETS, player, rocket,
+  rocketNDC() {
+    const v = rocket.group.position.clone().project(camera);
+    return { x: v.x, y: v.y, behind: v.z > 1 };
+  }
+};
 loop();
