@@ -20,8 +20,49 @@ import { minimap } from './ui/minimap.js';
 import { initPanels, openPanel, closePanel, loadCustomWishes } from './ui/panels.js';
 import { runOpening, getWarp } from './ui/opening.js';
 
+// Loading Manager
+const loadingScreen = document.getElementById('loading-screen');
+const loadingBarFill = document.getElementById('loading-bar-fill');
+const loadingPercentage = document.getElementById('loading-percentage');
+
+let loadingProgress = 0;
+const loadingSteps = [
+  { name: 'Initializing renderer', weight: 10 },
+  { name: 'Creating universe', weight: 15 },
+  { name: 'Loading assets', weight: 25 },
+  { name: 'Building planets', weight: 20 },
+  { name: 'Preparing scene', weight: 15 },
+  { name: 'Final touches', weight: 15 }
+];
+
+function updateLoadingProgress(step) {
+  const stepData = loadingSteps[step];
+  if (!stepData) return;
+  
+  loadingProgress += stepData.weight;
+  if (loadingBarFill) loadingBarFill.style.width = `${loadingProgress}%`;
+  if (loadingPercentage) loadingPercentage.textContent = `${Math.round(loadingProgress)}%`;
+}
+
+function hideLoadingScreen() {
+  loadingProgress = 100;
+  if (loadingBarFill) loadingBarFill.style.width = '100%';
+  if (loadingPercentage) loadingPercentage.textContent = '100%';
+  
+  setTimeout(() => {
+    if (loadingScreen) {
+      loadingScreen.classList.add('loaded');
+      setTimeout(() => {
+        loadingScreen.style.display = 'none';
+      }, 600);
+    }
+  }, 300);
+}
+
 const canvas = document.getElementById('scene');
 initInput(canvas);
+
+updateLoadingProgress(0);
 
 const renderer = new THREE.WebGLRenderer({
   canvas,
@@ -33,6 +74,8 @@ renderer.setSize(innerWidth, innerHeight);
 renderer.outputColorSpace = THREE.SRGBColorSpace;
 renderer.toneMapping = THREE.ACESFilmicToneMapping;
 renderer.toneMappingExposure = 0.15;
+
+updateLoadingProgress(1);
 
 const scene = new THREE.Scene();
 scene.fog = new THREE.FogExp2(0x0a0f2e, 0.00085);
@@ -49,6 +92,7 @@ rim.position.set(-60, -30, -80);
 scene.add(rim);
 
 const universe = createUniverse(scene);
+updateLoadingProgress(2);
 
 const rocket = createRocket();
 scene.add(rocket.group);
@@ -58,9 +102,13 @@ const photoList = remotePhotos && remotePhotos.length
   ? remotePhotos.map(p => ({ filename: p.filename, caption: p.caption, url: `./assets/photos/${encodeURIComponent(p.filename)}` }))
   : null;
 
+updateLoadingProgress(3);
+
 createPlanets(scene, camera, photoList);
 createEggs(scene);
 const guestHologram = createGuestHologram(scene);
+
+updateLoadingProgress(4);
 
 {
   const wp = PLANETS.find(p => p.id === 'wishes');
@@ -246,6 +294,9 @@ function startPerfMonitor() {
     perfFrames = 0; perfTime = 0;
   }, 5000);
 }
+
+updateLoadingProgress(5);
+hideLoadingScreen();
 
 runOpening({ rocket });
 
