@@ -288,10 +288,10 @@ export function photoArt(idx, caption) {
   return c;
 }
 
-export function photoFrameTexture(imgCanvasOrURL, caption, idx) {
-  const W = 512, H = 420;
-  const c = makeCanvas(W, H);
-  const x = c.getContext('2d');
+export function paintPhotoFrame(canvas, imgCanvasOrURL, caption, idx) {
+  const W = canvas.width, H = canvas.height;
+  const x = canvas.getContext('2d');
+  x.clearRect(0, 0, W, H);
   const frameGrad = x.createLinearGradient(0, 0, W, 0);
   frameGrad.addColorStop(0, 'rgba(180,170,255,0.9)');
   frameGrad.addColorStop(0.5, 'rgba(255,255,255,0.98)');
@@ -319,7 +319,12 @@ export function photoFrameTexture(imgCanvasOrURL, caption, idx) {
   x.textAlign = 'center';
   x.fillStyle = '#3a2c66';
   x.fillText(caption, W / 2, H - 46);
-  return c;
+  return canvas;
+}
+
+export function photoFrameTexture(imgCanvasOrURL, caption, idx) {
+  const c = makeCanvas(512, 420);
+  return paintPhotoFrame(c, imgCanvasOrURL, caption, idx);
 }
 
 export function wishCardTexture(name, message) {

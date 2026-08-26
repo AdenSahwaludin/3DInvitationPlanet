@@ -1,0 +1,20 @@
+const BASE = 'http://localhost:5173';
+const j = async (p, o) => { const r = await fetch(BASE + p, o); return { s: r.status, b: await r.json().catch(() => null) }; };
+const post = (p, d) => j(p, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(d) });
+
+let r;
+r = await post('/api/track', { path: '/Aden', guest: 'Aden', ref: 'https://wa.me/', screen: '1920x1080' });
+console.log('POST /api/track       :', r.s);
+r = await post('/api/rsvp', { name: 'Budi Tamu', guests: 2, attending: true });
+console.log('POST /api/rsvp        :', r.s);
+r = await j('/api/rsvp');
+console.log('RSVP row              :', JSON.stringify(r.b[0]));
+r = await j('/api/visits');
+console.log('VISIT row             :', JSON.stringify(r.b[0]));
+r = await fetch(BASE + '/Aden');
+console.log('GET /Aden             :', r.status, (await r.text()).includes('launch-btn') ? '(index served OK)' : '(WRONG)');
+r = await fetch(BASE + '/db');
+const dbHtml = await r.text();
+console.log('GET /db               :', r.status, dbHtml.includes('MISSION CONTROL') ? '(admin served OK)' : '(WRONG)');
+r = await j('/api/photos');
+console.log('PHOTOS                :', JSON.stringify(r.b));

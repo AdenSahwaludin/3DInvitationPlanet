@@ -1,34 +1,34 @@
 import * as THREE from 'three';
 
-const WEDDING_DATE = '2026-12-12T08:00:00+07:00';
+const WEDDING_DATE = '2026-10-18T08:00:00+07:00';
 
 export const CONFIG = {
-  bride: 'Celeste',
-  groom: 'Arka',
-  couple: 'Arka & Celeste',
+  bride: 'Mega Dwi Wahyuni',
+  groom: 'Aden Sahwaludin',
+  couple: 'Aden & Mega',
   tagline: 'A Journey Written Among The Stars',
-  hashtag: '#ArkaCelesteAmongTheStars',
+  hashtag: "#i'AM-AmongTheStars",
   weddingDate: WEDDING_DATE,
   quote: 'Two souls, one universe.',
   couplePhoto: '',
   story: [
-    { year: '2019', title: 'First Meeting', icon: '☕', text: 'A rainy afternoon in a small bookstore. Arka reached for the last copy of a novel — and so did Celeste. They shared the table, the coffee, and eventually, everything.' },
+    { year: '2019', title: 'First Meeting', icon: '☕', text: 'A rainy afternoon in a small bookstore. Aden reached for the last copy of a novel — and so did Mega. They shared the table, the coffee, and eventually, everything.' },
     { year: '2021', title: 'Our First Adventure', icon: '🏔️', text: 'A spontaneous road trip to the mountains. Wrong turns, terrible playlists, and a sunrise that made us promise to keep exploring — together.' },
-    { year: '2024', title: 'The Proposal', icon: '💍', text: 'Under a sky full of stars on the observatory hill, Arka knelt down. Celeste said yes before he could even finish the question.' },
+    { year: '2024', title: 'The Proposal', icon: '💍', text: 'Under a sky full of stars on the observatory hill, Aden knelt down. Mega said yes before he could even finish the question.' },
     { year: '2026', title: 'Our Forever', icon: '✨', text: 'And now, surrounded by everyone we love, we begin the greatest adventure of all. Thank you for being part of our universe.' }
   ],
   events: [
-    { name: 'Akad Nikah', date: 'Saturday, 12 December 2026', time: '08:00 — 10:00 WIB', place: 'The Celestial Ballroom', icon: '💫' },
-    { name: 'Resepsi', date: 'Saturday, 12 December 2026', time: '11:00 — 14:00 WIB', place: 'The Celestial Grand Hall', icon: '🥂' }
+    { name: 'Akad Nikah', date: 'Minggu, 18 Oktober 2026', time: '08:00 — 10:00 WIB', place: 'Gebangmampang, Margamulya, Bongas', icon: '💫' },
+    { name: 'Resepsi', date: 'Minggu, 18 Oktober 2026', time: '11:00 — Selesai', place: 'Gebangmampang, Margamulya, Bongas', icon: '🥂' }
   ],
   venue: {
-    name: 'The Celestial Ballroom',
-    address: 'Jl. Bintang Utara No. 88, Jakarta Selatan, Indonesia',
-    mapsQuery: 'Jl. Bintang Utara No. 88, Jakarta Selatan, Indonesia'
+    name: 'Gebangmampang, Margamulya, Bongas',
+    address: 'Gebangmampang, Margamulya, Bongas, Indramayu — lihat pin Google Maps',
+    mapsQuery: '-6.3809945,108.033242'
   },
   gifts: [
-    { bank: 'BCA', number: '1234567890', holder: 'Arka & Celeste' },
-    { bank: 'Mandiri', number: '9876543210', holder: 'Celeste Arka' }
+    { bank: 'Seabank', number: '901127285814', holder: 'Aden Sahwwaludin' },
+    { bank: 'Bank Jago', number: '108797651095', holder: 'Mega Dwi Wahyuni' }
   ],
   giftNote: 'Your presence is the greatest gift. However, if you wish to honour us with a token of love, you may send it to the accounts below.',
   giftAddress: 'Physical gifts can be sent to: Jl. Bintang Utara No. 88, Jakarta Selatan.',
@@ -51,3 +51,8 @@ export const THEME = {
   champagne: 0xf7e7ce,
   gold: 0xffd88a
 };
+
+export const DATE_DOT = (() => {
+  const d = new Date(WEDDING_DATE);
+  return `${String(d.getDate()).padStart(2, '0')} · ${String(d.getMonth() + 1).padStart(2, '0')} · ${d.getFullYear()}`;
+})();

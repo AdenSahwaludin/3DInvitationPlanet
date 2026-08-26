@@ -1,17 +1,20 @@
 import * as THREE from 'three';
 import { CONFIG } from '../config.js';
 import { state, emit } from '../core/state.js';
+import { GUEST_LINE } from '../core/guest.js';
 import { audio } from '../core/audio.js';
 import { cameraRig } from '../game/cameraRig.js';
 
 export function runOpening({ rocket }) {
   const intro = document.getElementById('intro');
+  const longName = (CONFIG.groom + CONFIG.bride).length > 18 ? ' long' : '';
   intro.innerHTML = `
     <div class="intro-vignette"></div>
     <div class="intro-content">
       <div class="intro-eyebrow">WEDDING SPACE ODYSSEY</div>
-      <h1 class="intro-title"><span>${CONFIG.groom.toUpperCase()}</span><i>&</i><span>${CONFIG.bride.toUpperCase()}</span></h1>
+      <h1 class="intro-title${longName}"><span>${CONFIG.groom.toUpperCase()}</span><i>&</i><span>${CONFIG.bride.toUpperCase()}</span></h1>
       <p class="intro-sub">${CONFIG.tagline}</p>
+      ${GUEST_LINE ? `<p class="intro-guest">${GUEST_LINE}</p>` : ''}
       <button class="cta-btn launch-btn" id="launch-btn">🚀 LAUNCH OUR STORY</button>
       <p class="intro-hint">Best with sound · headphones recommended</p>
     </div>`;

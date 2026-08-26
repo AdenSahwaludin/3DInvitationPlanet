@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CONFIG, DATE_DOT } from '../config.js';
 import { state, emit } from '../core/state.js';
 import { audio } from '../core/audio.js';
 import { cameraRig } from '../game/cameraRig.js';
@@ -96,8 +97,8 @@ export function playFinale({ scene, rocket, player, foreverPlanet }) {
     setTimeout(() => cap.innerHTML = '<span>Thank you for being part of our universe.</span>', 5200);
     setTimeout(() => {
       cap.innerHTML = `
-        <div class="finale-initials fade-in">A ♥ C</div>
-        <div class="finale-date">12 · 12 · 2026</div>`;
+        <div class="finale-initials fade-in">${CONFIG.groom[0]} ♥ ${CONFIG.bride[0]}</div>
+        <div class="finale-date">${DATE_DOT}</div>`;
     }, 9200);
     setTimeout(() => ret.classList.remove('hidden'), 10600);
 

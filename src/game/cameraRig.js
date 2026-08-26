@@ -121,9 +121,10 @@ export const cameraRig = {
       this.curLook.lerp(desiredLook, 1 - Math.exp(-dt * 5));
     }
 
-    this.shake = damp(this.shake, (speedNorm * 0.05 + (boostOn ? 0.05 : 0)), 4, dt);
-    const sx = (Math.random() - 0.5) * this.shake;
-    const sy = (Math.random() - 0.5) * this.shake;
+    this.shake = damp(this.shake, speedNorm * 0.035 + (boostOn ? 0.028 : 0), 3, dt);
+    this.shakeT = (this.shakeT || 0) + dt;
+    const sx = Math.sin(this.shakeT * 5.1) * this.shake;
+    const sy = Math.sin(this.shakeT * 3.7 + 1.3) * this.shake * 0.6;
 
     cam.position.copy(this.curPos);
     cam.position.x += sx; cam.position.y += sy;

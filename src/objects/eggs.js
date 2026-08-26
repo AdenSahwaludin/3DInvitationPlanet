@@ -1,4 +1,5 @@
 import * as THREE from 'three';
+import { CONFIG } from '../config.js';
 import { iconSprite, glowSprite, starSprite } from '../graphics/textures.js';
 
 export const EGGS = [];
@@ -80,7 +81,7 @@ export function createEggs(scene) {
     x.shadowColor = 'rgba(255,200,240,0.9)';
     x.shadowBlur = 18;
     x.fillStyle = '#ffeaf8';
-    x.fillText('A ♥ C', 128, 64);
+    x.fillText(`${CONFIG.groom[0]} ♥ ${CONFIG.bride[0]}`, 128, 64);
     return new THREE.CanvasTexture(c);
   })(), transparent: true, depthWrite: false }));
   iTex.scale.set(5, 2.5, 1);

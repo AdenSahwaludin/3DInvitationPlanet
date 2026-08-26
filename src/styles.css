@@ -562,6 +562,7 @@ body.has-touch .minimap-wrap { bottom: auto; top: calc(66px + env(safe-area-inse
   animation: riseIn 1.6s cubic-bezier(0.22, 1, 0.36, 1) 1.3s forwards;
 }
 .intro-title i { font-style: normal; font-size: 0.55em; vertical-align: middle; margin: 0 0.35em; color: var(--gold); -webkit-text-fill-color: var(--gold); }
+.intro-title.long { font-size: clamp(19px, 4vw, 44px); line-height: 1.5; }
 .intro-title span { display: inline-block; }
 .intro-sub {
   font-size: clamp(12px, 2vw, 17px);
@@ -569,6 +570,15 @@ body.has-touch .minimap-wrap { bottom: auto; top: calc(66px + env(safe-area-inse
   color: var(--text-dim);
   opacity: 0;
   animation: riseIn 1.4s ease 2s forwards;
+}
+.intro-guest {
+  margin-top: 22px;
+  font-size: clamp(14px, 2.4vw, 19px);
+  letter-spacing: 0.12em;
+  color: var(--gold);
+  text-shadow: 0 0 22px rgba(255, 216, 138, 0.55);
+  opacity: 0;
+  animation: riseIn 1.4s ease 2.5s forwards;
 }
 .launch-btn { margin-top: 44px; opacity: 0; animation: riseIn 1.2s ease 2.9s forwards, shimmer 3.2s ease infinite; }
 .launch-btn:disabled { filter: saturate(0.4); pointer-events: none; }

@@ -3,8 +3,12 @@ import { CONFIG } from '../config.js';
 import { QUALITY } from '../core/quality.js';
 import {
   planetTexture, ringTexture, iconSprite, glowSprite, textSprite,
-  photoFrameTexture, photoArt, starSprite, wishCardTexture, heartNebulaTexture, nebulaTexture
+  paintPhotoFrame, photoArt, starSprite, wishCardTexture, heartNebulaTexture
 } from '../graphics/textures.js';
+
+function path_label(filename) {
+  return String(filename).replace(/\.[a-z0-9]+$/i, '').replace(/[-_]+/g, ' ').slice(0, 40);
+}
 
 export const PLANETS = [];
 export const INTERACTIVE_3D = { photos: [], nodes: [] };
@@ -122,7 +126,7 @@ function buildPlanet(def) {
   return { group, mesh, atmo, halo, icon, orbitTiltGroup, orbParticles, satellites, ringMesh };
 }
 
-function buildExtras(p, def, scene) {
+function buildExtras(p, def, scene, photoList) {
   const extras = {};
   const g = p.group;
 
@@ -258,22 +262,40 @@ function buildExtras(p, def, scene) {
 
   if (def.id === 'memory') {
     extras.photoFrames = [];
-    const captions = ['First Meeting', 'First Trip', 'Golden Hour', 'The Proposal', 'Little Moments', 'Stargazing', 'Always Us'];
-    captions.forEach((cap, i) => {
-      const art = CONFIG.photos[i] ? null : photoArt(i, '');
-      const texCanvas = photoFrameTexture(CONFIG.photos[i] || art, cap, i);
-      const tex = new THREE.CanvasTexture(texCanvas);
+    const DEFAULT_CAPTIONS = ['First Meeting', 'First Trip', 'Golden Hour', 'The Proposal', 'Little Moments', 'Stargazing', 'Always Us'];
+    let list;
+    if (photoList && photoList.length) {
+      list = photoList.map(p => ({ caption: p.caption || path_label(p.filename), url: p.url }));
+      for (let i = list.length; i < Math.max(7, list.length); i++) {
+        list.push({ caption: DEFAULT_CAPTIONS[i % DEFAULT_CAPTIONS.length], url: null });
+      }
+    } else {
+      list = DEFAULT_CAPTIONS.map(cap => ({ caption: cap, url: null }));
+    }
+    list.forEach((ph, i) => {
+      const canvas = document.createElement('canvas');
+      canvas.width = 512;
+      canvas.height = 420;
+      paintPhotoFrame(canvas, null, ph.caption, i);
+      const tex = new THREE.CanvasTexture(canvas);
       tex.colorSpace = THREE.SRGBColorSpace;
+      if (ph.url) {
+        const img = new Image();
+        img.onload = () => {
+          paintPhotoFrame(canvas, img, ph.caption, i);
+          tex.needsUpdate = true;
+        };
+        img.src = ph.url;
+      }
       const frame = new THREE.Mesh(
         new THREE.PlaneGeometry(4.1, 3.37),
         new THREE.MeshBasicMaterial({ map: tex, transparent: true, side: THREE.DoubleSide })
       );
       g.add(frame);
       const pf = {
-        obj: frame, caption: cap, src: CONFIG.photos[i] || null,
-        artIdx: i,
+        obj: frame, caption: ph.caption, src: ph.url || null, canvas,
         r: def.size * (2.1 + (i % 3) * 0.45),
-        a: (i / captions.length) * Math.PI * 2,
+        a: (i / list.length) * Math.PI * 2,
         spd: 0.1 + (i % 4) * 0.02,
         y: ((i % 3) - 1) * def.size * 0.62
       };
@@ -310,7 +332,7 @@ function buildExtras(p, def, scene) {
     g.add(diamond);
     extras.diamond = diamond;
 
-    const iniTex = textSprite('A ♥ C', { font: '700 54px Cinzel, serif', fill: '#ffe9f6', glow: 'rgba(255,170,220,0.95)' });
+    const iniTex = textSprite(`${CONFIG.groom[0]} ♥ ${CONFIG.bride[0]}`, { font: '700 54px Cinzel, serif', fill: '#ffe9f6', glow: 'rgba(255,170,220,0.95)' });
     const initials = new THREE.Sprite(new THREE.SpriteMaterial({ map: iniTex, transparent: true, depthWrite: false }));
     const iasp = iniTex.userData.aspect || 2;
     initials.scale.set(9, 9 / iasp, 1);
@@ -329,11 +351,11 @@ function buildExtras(p, def, scene) {
 
 export let CAMERA_REF = null;
 
-export function createPlanets(scene, camera) {
+export function createPlanets(scene, camera, photoList = null) {
   CAMERA_REF = camera;
   for (const def of DEFS) {
     const built = buildPlanet(def);
-    const extras = buildExtras(built, def, scene);
+    const extras = buildExtras(built, def, scene, photoList);
     const planet = {
       ...built,
       ...extras,
@@ -478,6 +500,11 @@ export function createPlanets(scene, camera) {
 function attachWishes(wishPlanet) {
   wishPlanet.wishCards = [];
   wishPlanet.wishAngle = Math.random() * 6;
+
+  wishPlanet.clearWishes = () => {
+    for (const w of wishPlanet.wishCards) wishPlanet.group.remove(w.obj);
+    wishPlanet.wishCards = [];
+  };
 
   const oldUpdate = wishPlanet.update;
   wishPlanet.update = (dt, t) => {

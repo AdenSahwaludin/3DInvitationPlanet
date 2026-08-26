@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="robots" content="noindex,nofollow"/>
+<title>Mission Control — DB Manager</title>
+<style>
+:root {
+  --deep:#060a24; --violet:#7c6cff; --lavender:#cfc3ff; --pink:#ff9ad5;
+  --gold:#ffd88a; --glass:rgba(18,22,60,.55); --border:rgba(207,195,255,.25); --text:#efeaff; --dim:rgba(230,222,255,.65);
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;background:radial-gradient(ellipse at 30% -10%,#1a1450 0%,var(--deep) 55%);color:var(--text);font-family:Quicksand,'Segoe UI',sans-serif;padding:28px 18px 60px}
+.wrap{max-width:1180px;margin:0 auto}
+h1{font-family:Cinzel,serif;font-size:clamp(20px,3.4vw,30px);letter-spacing:.18em;text-align:center;background:linear-gradient(110deg,#fff,var(--gold) 40%,var(--pink));-webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.sub{text-align:center;color:var(--dim);font-size:12px;letter-spacing:.28em;margin:8px 0 26px}
+.stats{display:flex;gap:12px;justify-content:center;flex-wrap:wrap;margin-bottom:24px}
+.stat{background:var(--glass);border:1px solid var(--border);border-radius:16px;padding:12px 22px;text-align:center;backdrop-filter:blur(10px)}
+.stat b{display:block;font-size:22px;color:var(--gold)}
+.stat span{font-size:10px;letter-spacing:.18em;color:var(--dim)}
+.tabs{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:18px}
+.tab{padding:10px 22px;border-radius:999px;border:1px solid var(--border);background:transparent;color:var(--dim);font-weight:700;font-size:13px;letter-spacing:.08em;cursor:pointer;transition:.2s}
+.tab.active{color:#241a3d;background:linear-gradient(120deg,var(--gold),var(--pink));border-color:transparent;box-shadow:0 0 24px rgba(255,216,138,.35)}
+.bar{display:flex;justify-content:space-between;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.bar label{font-size:12px;color:var(--dim);display:flex;align-items:center;gap:6px;cursor:pointer}
+button.act{padding:8px 16px;border-radius:10px;border:1px solid var(--border);background:rgba(124,108,255,.1);color:var(--lavender);font-weight:600;font-size:12px;cursor:pointer;transition:.2s}
+button.act:hover{background:rgba(124,108,255,.25)}
+button.act.danger{border-color:rgba(255,120,140,.4);color:#ff9db0}
+button.act.danger:hover{background:rgba(255,120,140,.15)}
+.tblwrap{overflow-x:auto;background:var(--glass);border:1px solid var(--border);border-radius:18px;backdrop-filter:blur(12px)}
+table{width:100%;border-collapse:collapse;font-size:13px;min-width:760px}
+th{font-size:10px;letter-spacing:.16em;color:var(--gold);text-align:left;padding:13px 14px;border-bottom:1px solid var(--border);white-space:nowrap}
+td{padding:11px 14px;border-bottom:1px solid rgba(207,195,255,.08);color:var(--text);vertical-align:top}
+tr:hover td{background:rgba(124,108,255,.06)}
+td .msg{color:var(--dim);font-size:12px}
+.yes{color:#7ef0c0;font-weight:700}.no{color:#ff9db0;font-weight:700}
+.badge{display:inline-block;padding:2px 9px;border-radius:99px;font-size:10.5px;border:1px solid var(--border);color:var(--lavender);margin-right:4px}
+input.cap{background:rgba(10,10,40,.6);border:1px solid var(--border);border-radius:8px;color:#fff;padding:6px 9px;font-family:inherit;font-size:12.5px;width:150px}
+.empty{text-align:center;padding:44px;color:var(--dim)}
+a{color:var(--lavender)}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>MISSION CONTROL</h1>
+  <div class="sub">WEDDING SPACE ODYSSEY · DATABASE MANAGER</div>
+  <div class="stats">
+    <div class="stat"><b id="s-rsvp">–</b><span>RSVP</span></div>
+    <div class="stat"><b id="s-att">–</b><span>HADIR</span></div>
+    <div class="stat"><b id="s-wish">–</b><span>WISHES</span></div>
+    <div class="stat"><b id="s-photo">–</b><span>FOTOS</span></div>
+    <div class="stat"><b id="s-visit">–</b><span>VISITS</span></div>
+  </div>
+  <div class="tabs">
+    <button class="tab active" data-t="rsvp">💌 RSVP</button>
+    <button class="tab" data-t="wishes">🌠 Wishes</button>
+    <button class="tab" data-t="photos">📸 Photos</button>
+    <button class="tab" data-t="visits">🛰️ Visitors</button>
+  </div>
+  <div class="bar">
+    <label><input type="checkbox" id="auto" checked/> auto-refresh 10s</label>
+    <div>
+      <button class="act" id="refresh">↻ Refresh</button>
+      <button class="act danger" id="clear-visits">Clear visitors</button>
+    </div>
+  </div>
+  <div class="tblwrap" id="content"><div class="empty">Loading…</div></div>
+</div>
+
+<script>
+let tab = 'rsvp';
+
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const dev = r => [r.device, r.os, r.browser].filter(Boolean).map(x => `<span class="badge">${esc(x)}</span>`).join('');
+const when = r => esc((r.created_at || '').replace('T', ' ').slice(0, 19));
+
+async function api(path, opts) {
+  const r = await fetch(path, opts);
+  return r.json();
+}
+
+async function loadAll() {
+  const [rsvp, wishes, photos, visits] = await Promise.all([
+    api('/api/rsvp'), api('/api/wishes'), api('/api/photos'), api('/api/visits')
+  ]);
+  document.getElementById('s-rsvp').textContent = rsvp.length;
+  document.getElementById('s-att').textContent = rsvp.filter(r => r.attending).length;
+  document.getElementById('s-wish').textContent = wishes.length;
+  document.getElementById('s-photo').textContent = photos.length;
+  document.getElementById('s-visit').textContent = visits.length;
+  return { rsvp, wishes, photos, visits };
+}
+
+function render(d) {
+  const el = document.getElementById('content');
+  if (tab === 'rsvp') {
+    el.innerHTML = !d.rsvp.length ? '<div class="empty">Belum ada RSVP masuk 🛸</div>' : `<table>
+      <tr><th>#</th><th>Nama</th><th>Tamu</th><th>Hadir</th><th>Perangkat</th><th>IP</th><th>Waktu</th><th></th></tr>
+      ${d.rsvp.map(r => `<tr>
+        <td>${r.id}</td><td><b>${esc(r.name)}</b></td><td>${r.guests}</td>
+        <td class="${r.attending ? 'yes' : 'no'}">${r.attending ? '✓ Hadir' : '✕ Tidak'}</td>
+        <td>${dev(r)}</td><td>${esc(r.ip || '–')}</td><td>${when(r)}</td>
+        <td><button class="act danger" onclick="del('/api/rsvp/${r.id}')">✕</button></td></tr>`).join('')}
+    </table>`;
+  } else if (tab === 'wishes') {
+    el.innerHTML = !d.wishes.length ? '<div class="empty">Belum ada ucapan 🌠</div>' : `<table>
+      <tr><th>#</th><th>Nama</th><th>Pesan</th><th>Perangkat</th><th>IP</th><th>Waktu</th><th></th></tr>
+      ${d.wishes.map(w => `<tr>
+        <td>${w.id}</td><td><b>${esc(w.name)}</b></td><td><div class="msg">${esc(w.message)}</div></td>
+        <td>${dev(w)}</td><td>${esc(w.ip || '–')}</td><td>${when(w)}</td>
+        <td><button class="act danger" onclick="del('/api/wishes/${w.id}')">✕</button></td></tr>`).join('')}
+    </table>`;
+  } else if (tab === 'photos') {
+    el.innerHTML = !d.photos.length ? '<div class="empty">Folder assets/photos masih kosong — letakkan foto di sana 📸</div>' : `<table>
+      <tr><th>#</th><th>File</th><th>Caption</th><th>Urutan</th><th></th></tr>
+      ${d.photos.map(p => `<tr>
+        <td>${p.id}</td><td>${esc(p.filename)}</td>
+        <td><input class="cap" data-id="${p.id}" value="${esc(p.caption)}"/></td>
+        <td><input class="cap" style="width:64px" data-sort="${p.id}" value="${p.sort_order}"/></td>
+        <td>
+          <button class="act" onclick="savePhoto(${p.id})">💾 Simpan</button>
+          <button class="act danger" onclick="del('/api/photos/${p.id}')">✕</button>
+        </td></tr>`).join('')}
+    </table>`;
+  } else {
+    el.innerHTML = !d.visits.length ? '<div class="empty">Belum ada kunjungan tercatat 🛰️</div>' : `<table>
+      <tr><th>#</th><th>Waktu</th><th>Perangkat</th><th>IP</th><th>Tamu (URL)</th><th>Path</th><th>Layar</th><th>Referrer</th><th></th></tr>
+      ${d.visits.map(v => `<tr>
+        <td>${v.id}</td><td>${when(v)}</td><td>${dev(v)}</td><td>${esc(v.ip || '–')}</td>
+        <td><b>${esc(v.guest || '–')}</b></td><td>${esc(v.path || '/')}</td><td>${esc(v.screen || '–')}</td>
+        <td><div class="msg">${esc(v.ref || 'langsung')}</div></td>
+        <td><button class="act danger" onclick="del('/api/visits/${v.id}')">✕</button></td></tr>`).join('')}
+    </table>`;
+  }
+}
+
+async function refresh() { render(await loadAll()); }
+window.del = async url => {
+  if (!confirm('Hapus data ini?')) return;
+  await fetch(url, { method: 'DELETE' });
+  refresh();
+};
+window.savePhoto = async id => {
+  const caption = document.querySelector(`input.cap[data-id="${id}"]`).value;
+  const sort_order = parseInt(document.querySelector(`input.cap[data-sort="${id}"]`).value, 10) || 0;
+  await fetch(`/api/photos/${id}`, { method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ caption, sort_order }) });
+  refresh();
+};
+document.getElementById('refresh').onclick = refresh;
+document.getElementById('clear-visits').onclick = async () => {
+  if (!confirm('Hapus SEMUA data kunjungan?')) return;
+  await fetch('/api/visits', { method: 'DELETE' });
+  refresh();
+};
+document.querySelectorAll('.tab').forEach(b => b.onclick = () => {
+  document.querySelectorAll('.tab').forEach(x => x.classList.remove('active'));
+  b.classList.add('active');
+  tab = b.dataset.t;
+  refresh();
+});
+setInterval(() => { if (document.getElementById('auto').checked) refresh(); }, 10000);
+refresh();
+</script>
+</body>
+</html>

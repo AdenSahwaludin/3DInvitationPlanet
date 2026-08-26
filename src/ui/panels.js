@@ -1,6 +1,8 @@
-import { CONFIG } from '../config.js';
+import { CONFIG, DATE_DOT } from '../config.js';
 import { state, emit } from '../core/state.js';
 import { audio } from '../core/audio.js';
+import { api } from '../core/api.js';
+import { GUEST } from '../core/guest.js';
 import { hud } from './hud.js';
 import { PLANETS } from '../objects/planets.js';
 
@@ -75,7 +77,7 @@ function wishesTpl() {
   return `
     <p class="pp-intro">Every message becomes a glowing card orbiting this planet.</p>
     <form class="wish-form" id="wish-form">
-      <input type="text" id="wish-name" required maxlength="40" placeholder="Your name"/>
+      <input type="text" id="wish-name" required maxlength="40" placeholder="Your name" value="${GUEST}"/>
       <textarea id="wish-msg" rows="3" maxlength="180" placeholder="Write your wishes for the stars... ✨" required></textarea>
       <button type="submit" class="cta-btn ui-el">SEND TO THE UNIVERSE 🌠</button>
     </form>
@@ -92,7 +94,7 @@ function loveTpl() {
   const d = new Date(CONFIG.weddingDate);
   const photo = CONFIG.couplePhoto
     ? `<img class="couple-photo" src="${CONFIG.couplePhoto}" alt="couple"/>`
-    : `<div class="couple-monogram">A<span>♥</span>C</div>`;
+    : `<div class="couple-monogram">${CONFIG.groom[0]}<span>♥</span>${CONFIG.bride[0]}</div>`;
   return `
     <div class="center-col">
       ${photo}
@@ -160,10 +162,10 @@ function rsvpTpl() {
   return `
     <form class="rsvp-form" id="rsvp-form">
       <label>Your Name
-        <input type="text" id="rsvp-name" required maxlength="60" placeholder="Full name"/>
+        <input type="text" id="rsvp-name" required maxlength="60" placeholder="Full name" value="${GUEST}"/>
       </label>
       <label>Number of Guests
-        <select id="rsvp-guests">${[1,2,3,4,5,6].map(n => `<option value="${n}" ${n===2?'selected':''}>${n} ${n === 1 ? 'guest' : 'guests'}</option>`).join('')}</select>
+        <select id="rsvp-guests">${[1, 2, 3, 4, 5, 6].map(n => `<option value="${n}" ${n === 2 ? 'selected' : ''}>${n} ${n === 1 ? 'guest' : 'guests'}</option>`).join('')}</select>
       </label>
       <label>Will you attend?
         <div class="attend-pills">
@@ -195,9 +197,9 @@ function memoryTpl() {
     <p class="pp-intro">Moments frozen in stardust. Fly close to the floating frames — or tap one here.</p>
     <div class="memory-grid">
       ${PLANETS.find(x => x.id === 'memory').photoFrames.map((f, i) => {
-        const src = f.src || f.obj.material.map.image.toDataURL();
-        return `<figure class="mem-thumb ui-el" data-i="${i}"><img src="${src}" alt="${f.caption}"/><figcaption>${f.caption}</figcaption></figure>`;
-      }).join('')}
+    const src = f.src || f.obj.material.map.image.toDataURL();
+    return `<figure class="mem-thumb ui-el" data-i="${i}"><img src="${src}" alt="${f.caption}"/><figcaption>${f.caption}</figcaption></figure>`;
+  }).join('')}
     </div>`;
 }
 
@@ -208,8 +210,8 @@ function foreverTpl() {
       <h2 class="finale-quote">“Our journey has just begun.”</h2>
       <p>Thank you for being part of our universe.</p>
       <div class="finale-meta">
-        <span class="fm-initials">A ♥ C</span>
-        <span class="fm-date">12 · 12 · 2026</span>
+        <span class="fm-initials">${CONFIG.groom[0]} ♥ ${CONFIG.bride[0]}</span>
+        <span class="fm-date">${DATE_DOT}</span>
         <span class="fm-tag">${CONFIG.hashtag}</span>
       </div>
       <p class="mini-note">Universe complete. All planets discovered. ✨</p>
@@ -234,6 +236,7 @@ function wire(p) {
         const guests = parseInt(document.getElementById('rsvp-guests').value, 10);
         const attending = document.querySelector('input[name="att"]:checked').value === 'yes';
         saveRSVP({ name, guests, attending, ts: Date.now() });
+        api.addRsvp(name, guests, attending);
         audio.success();
         if (onFireworks) onFireworks();
         hud.missionConfirmed();
@@ -275,16 +278,17 @@ function wire(p) {
 
   if (p.id === 'wishes') {
     const form = document.getElementById('wish-form');
-    form.addEventListener('submit', e => {
+    form.addEventListener('submit', async e => {
       e.preventDefault();
       const name = document.getElementById('wish-name').value.trim();
       const message = document.getElementById('wish-msg').value.trim();
       if (!name || !message) return;
       const wp = PLANETS.find(x => x.id === 'wishes');
+      const saved = await api.addWish(name, message);
       wp.addWish(name, message);
-      saveWish(name, message);
+      if (!saved) saveWish(name, message);
       audio.success();
-      hud.showToast('Your wish now orbits the universe ✨');
+      hud.showToast(saved ? 'Your wish now orbits the universe ✨' : 'Wish saved on this device ✨');
       openPanel(p);
     });
   }

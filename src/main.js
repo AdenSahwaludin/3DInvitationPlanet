@@ -2,12 +2,16 @@ import * as THREE from 'three';
 import { CONFIG } from './config.js';
 import { QUALITY } from './core/quality.js';
 import { state, bus, emit, on } from './core/state.js';
-import { initInput, consumeMap } from './core/input.js';import { audio } from './core/audio.js';
+import { initInput, consumeMap } from './core/input.js';
+import { audio } from './core/audio.js';
+import { api } from './core/api.js';
+import { GUEST } from './core/guest.js';
 import { updateTweens, tween } from './core/tween.js';
 import { createUniverse } from './world/universe.js';
 import { createRocket } from './objects/rocket.js';
 import { createPlanets, PLANETS, INTERACTIVE_3D } from './objects/planets.js';
 import { createEggs } from './objects/eggs.js';
+import { createGuestHologram } from './objects/guestHologram.js';
 import { createPlayer } from './game/player.js';
 import { cameraRig } from './game/cameraRig.js';
 import { playFinale, spawnFirework, updateFireworks } from './game/finale.js';
@@ -49,8 +53,25 @@ const universe = createUniverse(scene);
 const rocket = createRocket();
 scene.add(rocket.group);
 
-createPlanets(scene, camera);
+const remotePhotos = await api.listPhotos();
+const photoList = remotePhotos && remotePhotos.length
+  ? remotePhotos.map(p => ({ filename: p.filename, caption: p.caption, url: `./assets/photos/${encodeURIComponent(p.filename)}` }))
+  : null;
+
+createPlanets(scene, camera, photoList);
 createEggs(scene);
+const guestHologram = createGuestHologram(scene);
+
+{
+  const wp = PLANETS.find(p => p.id === 'wishes');
+  const remoteWishes = await api.listWishes();
+  if (remoteWishes && remoteWishes.length) {
+    wp.clearWishes();
+    remoteWishes.forEach(w => wp.addWish(w.name, w.message));
+  } else {
+    loadCustomWishes().forEach(w => wp.addWish(w.name, w.message));
+  }
+}
 
 const player = createPlayer(rocket);
 const rocketProxy = {
@@ -67,11 +88,6 @@ initPanels({
     setTimeout(() => spawnFirework(scene, c, 8), 380);
   }
 });
-
-{
-  const wp = PLANETS.find(p => p.id === 'wishes');
-  loadCustomWishes().forEach(w => wp.addWish(w.name, w.message));
-}
 
 tween({ from: 0.15, to: 1.05, dur: 3.5, ease: 'outQuad', onUpdate: v => { renderer.toneMappingExposure = v; } });
 
@@ -233,6 +249,18 @@ function startPerfMonitor() {
 
 runOpening({ rocket });
 
+fetch('/api/track', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    path: location.pathname,
+    guest: GUEST,
+    ref: document.referrer,
+    screen: `${screen.width}x${screen.height}`,
+    lang: navigator.language
+  })
+}).catch(() => {});
+
 const clock = new THREE.Clock();
 let elapsed = 0;
 
@@ -254,6 +282,7 @@ function loop() {
   rocketProxy.yaw = rocket.group.rotation.y;
 
   for (const p of PLANETS) p.update(dt, elapsed);
+  guestHologram && guestHologram.update(dt);
 
   const warp = Math.max(0, getWarp());
   universe.update(dt, player.pos, camera.quaternion, warp);
