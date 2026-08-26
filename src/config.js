@@ -12,10 +12,10 @@ export const CONFIG = {
   quote: 'Two souls, one universe.',
   couplePhoto: '',
   story: [
-    { year: '2019', title: 'First Meeting', icon: '☕', text: 'A rainy afternoon in a small bookstore. Aden reached for the last copy of a novel — and so did Mega. They shared the table, the coffee, and eventually, everything.' },
-    { year: '2021', title: 'Our First Adventure', icon: '🏔️', text: 'A spontaneous road trip to the mountains. Wrong turns, terrible playlists, and a sunrise that made us promise to keep exploring — together.' },
-    { year: '2024', title: 'The Proposal', icon: '💍', text: 'Under a sky full of stars on the observatory hill, Aden knelt down. Mega said yes before he could even finish the question.' },
-    { year: '2026', title: 'Our Forever', icon: '✨', text: 'And now, surrounded by everyone we love, we begin the greatest adventure of all. Thank you for being part of our universe.' }
+    { year: '2016', title: 'Awal Kenal', icon: '✨', text: 'Kisah kami berawal di tahun 2016, perkenalan sederhana yang membuka lembaran awal perjalanan penuh cerita.' },
+    { year: '2022', title: 'Pertama Bertemu', icon: '☕', text: 'Semesta mempertemukan kami secara langsung. Momen tatap muka dan obrolan hangat yang meyakinkan langkah kami bersama.' },
+    { year: '2024', title: 'Lamaran & Tunangan', icon: '💍', text: 'Mengikat komitmen dan janji suci di hadapan keluarga tercinta untuk melangkah ke jenjang yang lebih serius.' },
+    { year: '2026', title: 'Hari Bahagia (Pernikahan)', icon: '💫', text: 'Mengawali babak baru kehidupan bersama, menyatukan dua insan dalam ikatan pernikahan yang abadi.' }
   ],
   events: [
     { name: 'Akad Nikah', date: 'Minggu, 18 Oktober 2026', time: '08:00 — 10:00 WIB', place: 'Gebangmampang, Margamulya, Bongas', icon: '💫' },

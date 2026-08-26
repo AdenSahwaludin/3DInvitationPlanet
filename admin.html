@@ -44,7 +44,7 @@ a{color:var(--lavender)}
 <body>
 <div class="wrap">
   <h1>MISSION CONTROL</h1>
-  <div class="sub">WEDDING SPACE ODYSSEY · DATABASE MANAGER</div>
+  <div class="sub">WEDDING SPACE ODYSSEY · DATABASE MANAGER · <a href="/" target="_blank" rel="noopener">Buka undangan ↗</a></div>
   <div class="stats">
     <div class="stat"><b id="s-rsvp">–</b><span>RSVP</span></div>
     <div class="stat"><b id="s-att">–</b><span>HADIR</span></div>
@@ -72,6 +72,10 @@ a{color:var(--lavender)}
 let tab = 'rsvp';
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const link = s => {
+  const u = encodeURIComponent(String(s ?? '').trim());
+  return u ? `<a href="/${u}" target="_blank" rel="noopener" title="Buka undangan tamu">/${esc(u)}</a>` : '–';
+};
 const dev = r => [r.device, r.os, r.browser].filter(Boolean).map(x => `<span class="badge">${esc(x)}</span>`).join('');
 const when = r => esc((r.created_at || '').replace('T', ' ').slice(0, 19));
 
@@ -96,18 +100,18 @@ function render(d) {
   const el = document.getElementById('content');
   if (tab === 'rsvp') {
     el.innerHTML = !d.rsvp.length ? '<div class="empty">Belum ada RSVP masuk 🛸</div>' : `<table>
-      <tr><th>#</th><th>Nama</th><th>Tamu</th><th>Hadir</th><th>Perangkat</th><th>IP</th><th>Waktu</th><th></th></tr>
+      <tr><th>#</th><th>Nama</th><th>Link</th><th>Tamu</th><th>Hadir</th><th>Perangkat</th><th>IP</th><th>Waktu</th><th></th></tr>
       ${d.rsvp.map(r => `<tr>
-        <td>${r.id}</td><td><b>${esc(r.name)}</b></td><td>${r.guests}</td>
+        <td>${r.id}</td><td><b>${esc(r.name)}</b></td><td>${link(r.name)}</td><td>${r.guests}</td>
         <td class="${r.attending ? 'yes' : 'no'}">${r.attending ? '✓ Hadir' : '✕ Tidak'}</td>
         <td>${dev(r)}</td><td>${esc(r.ip || '–')}</td><td>${when(r)}</td>
         <td><button class="act danger" onclick="del('/api/rsvp/${r.id}')">✕</button></td></tr>`).join('')}
     </table>`;
   } else if (tab === 'wishes') {
     el.innerHTML = !d.wishes.length ? '<div class="empty">Belum ada ucapan 🌠</div>' : `<table>
-      <tr><th>#</th><th>Nama</th><th>Pesan</th><th>Perangkat</th><th>IP</th><th>Waktu</th><th></th></tr>
+      <tr><th>#</th><th>Nama</th><th>Link</th><th>Pesan</th><th>Perangkat</th><th>IP</th><th>Waktu</th><th></th></tr>
       ${d.wishes.map(w => `<tr>
-        <td>${w.id}</td><td><b>${esc(w.name)}</b></td><td><div class="msg">${esc(w.message)}</div></td>
+        <td>${w.id}</td><td><b>${esc(w.name)}</b></td><td>${link(w.name)}</td><td><div class="msg">${esc(w.message)}</div></td>
         <td>${dev(w)}</td><td>${esc(w.ip || '–')}</td><td>${when(w)}</td>
         <td><button class="act danger" onclick="del('/api/wishes/${w.id}')">✕</button></td></tr>`).join('')}
     </table>`;
@@ -128,7 +132,7 @@ function render(d) {
       <tr><th>#</th><th>Waktu</th><th>Perangkat</th><th>IP</th><th>Tamu (URL)</th><th>Path</th><th>Layar</th><th>Referrer</th><th></th></tr>
       ${d.visits.map(v => `<tr>
         <td>${v.id}</td><td>${when(v)}</td><td>${dev(v)}</td><td>${esc(v.ip || '–')}</td>
-        <td><b>${esc(v.guest || '–')}</b></td><td>${esc(v.path || '/')}</td><td>${esc(v.screen || '–')}</td>
+        <td>${v.guest ? link(v.guest) : '–'}</td><td>${esc(v.path || '/')}</td><td>${esc(v.screen || '–')}</td>
         <td><div class="msg">${esc(v.ref || 'langsung')}</div></td>
         <td><button class="act danger" onclick="del('/api/visits/${v.id}')">✕</button></td></tr>`).join('')}
     </table>`;
