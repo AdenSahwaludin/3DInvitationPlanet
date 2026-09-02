@@ -226,17 +226,129 @@ export const hud = {
 
   lightbox(contentCanvasOrSrc, caption = '') {
     const lb = document.getElementById('lightbox');
-    let inner;
+    let src;
     if (typeof contentCanvasOrSrc === 'string') {
-      inner = `<img src="${contentCanvasOrSrc}" alt="${caption}"/>`;
+      src = contentCanvasOrSrc;
     } else {
-      const url = contentCanvasOrSrc.toDataURL ? contentCanvasOrSrc.toDataURL() : '';
-      inner = `<img src="${url}" alt="${caption}"/>`;
+      src = contentCanvasOrSrc.toDataURL ? contentCanvasOrSrc.toDataURL() : '';
     }
-    lb.innerHTML = `<div class="lb-inner glass-panel">${inner}<div class="lb-caption">${caption}</div><button class="icon-btn lb-close">✕</button></div>`;
+    lb.innerHTML = `<div class="lb-inner glass-panel"><div class="lb-zoom-wrap" id="lb-zoom-wrap"><img id="lb-img" src="${src}" alt="${caption}" draggable="false"/></div><div class="lb-caption">${caption}</div><div class="lb-toolbar"><button class="icon-btn lb-zoom-btn" id="lb-zoom-out" title="Zoom Out" aria-label="Zoom Out">−</button><button class="icon-btn lb-zoom-btn" id="lb-zoom-reset" title="Reset Zoom" aria-label="Reset">⟲</button><button class="icon-btn lb-zoom-btn" id="lb-zoom-in" title="Zoom In" aria-label="Zoom In">+</button></div><button class="icon-btn lb-close" aria-label="Close">✕</button></div>`;
     lb.classList.remove('hidden');
-    lb.querySelector('.lb-close').onclick = () => lb.classList.add('hidden');
+    const wrap = lb.querySelector('#lb-zoom-wrap');
+    const img = lb.querySelector('#lb-img');
+    const btnIn = lb.querySelector('#lb-zoom-in');
+    const btnOut = lb.querySelector('#lb-zoom-out');
+    const btnReset = lb.querySelector('#lb-zoom-reset');
+    const btnClose = lb.querySelector('.lb-close');
+    btnClose.onclick = () => lb.classList.add('hidden');
     lb.onclick = e => { if (e.target === lb) lb.classList.add('hidden'); };
+
+    let scale = 1;
+    let tx = 0;
+    let ty = 0;
+    const MIN = 1;
+    const MAX = 3;
+    const STEP = 0.4;
+
+    const clampPan = () => {
+      if (scale <= 1) { tx = 0; ty = 0; return; }
+      // keep image within wrap bounds
+      const wrapW = wrap.clientWidth;
+      const wrapH = wrap.clientHeight;
+      // img natural display size
+      const imgW = img.clientWidth * scale;
+      const imgH = img.clientHeight * scale;
+      const maxX = Math.max(0, (imgW - wrapW) / 2);
+      const maxY = Math.max(0, (imgH - wrapH) / 2);
+      tx = Math.max(-maxX, Math.min(maxX, tx));
+      ty = Math.max(-maxY, Math.min(maxY, ty));
+    };
+
+    const apply = () => {
+      clampPan();
+      img.style.transform = `translate(${tx}px, ${ty}px) scale(${scale})`;
+      btnOut.disabled = scale <= MIN + 0.001;
+      btnIn.disabled = scale >= MAX - 0.001;
+      btnOut.style.opacity = btnOut.disabled ? '0.35' : '1';
+      btnIn.style.opacity = btnIn.disabled ? '0.35' : '1';
+      wrap.style.cursor = scale > 1 ? 'grab' : 'default';
+    };
+
+    const setScale = (next) => {
+      scale = Math.max(MIN, Math.min(MAX, next));
+      if (scale === 1) { tx = 0; ty = 0; }
+      apply();
+    };
+
+    btnIn.onclick = (e) => { e.stopPropagation(); setScale(scale + STEP); };
+    btnOut.onclick = (e) => { e.stopPropagation(); setScale(scale - STEP); };
+    btnReset.onclick = (e) => { e.stopPropagation(); scale = 1; tx = 0; ty = 0; apply(); };
+
+    // Prevent wheel / pinch / gesture zoom via hands – only toolbar allowed
+    const prevent = (e) => e.preventDefault();
+    wrap.addEventListener('wheel', prevent, { passive: false });
+    lb.addEventListener('wheel', prevent, { passive: false });
+    const onTouch = (e) => { if (e.touches.length > 1) e.preventDefault(); };
+    lb.addEventListener('touchstart', onTouch, { passive: false });
+    lb.addEventListener('touchmove', onTouch, { passive: false });
+    lb.addEventListener('gesturestart', prevent);
+    lb.addEventListener('gesturechange', prevent);
+    lb.addEventListener('gestureend', prevent);
+    img.addEventListener('dragstart', prevent);
+    // block double-tap zoom
+    let lastTap = 0;
+    lb.addEventListener('touchend', (e) => {
+      const now = Date.now();
+      if (now - lastTap < 350) e.preventDefault();
+      lastTap = now;
+    }, { passive: false });
+    img.addEventListener('dblclick', prevent);
+
+    // Drag to pan when zoomed (single finger / mouse) – not a zoom gesture
+    let isDragging = false;
+    let startX = 0, startY = 0, startTX = 0, startTY = 0;
+    let activePointer = null;
+    wrap.addEventListener('pointerdown', (e) => {
+      if (scale <= 1) return;
+      isDragging = true;
+      activePointer = e.pointerId;
+      startX = e.clientX;
+      startY = e.clientY;
+      startTX = tx;
+      startTY = ty;
+      wrap.setPointerCapture(activePointer);
+      img.style.transition = 'none';
+      wrap.style.cursor = 'grabbing';
+      e.preventDefault();
+    });
+    wrap.addEventListener('pointermove', (e) => {
+      if (!isDragging) return;
+      const dx = e.clientX - startX;
+      const dy = e.clientY - startY;
+      tx = startTX + dx;
+      ty = startTY + dy;
+      apply();
+      img.style.transition = 'none';
+    });
+    const endDrag = (e) => {
+      if (!isDragging) return;
+      isDragging = false;
+      img.style.transition = 'transform 0.2s ease';
+      wrap.style.cursor = scale > 1 ? 'grab' : 'default';
+      if (activePointer !== null) {
+        try { wrap.releasePointerCapture(activePointer); } catch {}
+        activePointer = null;
+      }
+    };
+    wrap.addEventListener('pointerup', endDrag);
+    wrap.addEventListener('pointercancel', endDrag);
+    wrap.addEventListener('pointerleave', endDrag);
+
+    img.style.transformOrigin = 'center center';
+    img.style.transition = 'transform 0.2s ease';
+    img.style.touchAction = 'none';
+    wrap.style.touchAction = 'none';
+    apply();
   },
 
   setMutedIcon(muted) {
