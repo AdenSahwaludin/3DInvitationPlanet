@@ -638,7 +638,7 @@ body.has-touch .minimap-wrap { bottom: auto; top: calc(66px + env(safe-area-inse
 #intro.launching { pointer-events: none; }
 #intro.gone { opacity: 0 !important; transition: opacity 0.9s ease; }
 .intro-vignette { position: absolute; inset: 0; background: radial-gradient(circle at 50% 50%, transparent 40%, rgba(2, 2, 14, 0.8)); pointer-events: none; }
-.intro-content { text-align: center; padding: 24px; }
+.intro-content { text-align: center; padding: 24px; max-width: 92vw; width: 100%; box-sizing: border-box; }
 .intro-eyebrow {
   font-size: clamp(10px, 1.6vw, 13px);
   letter-spacing: 0.5em;
@@ -671,13 +671,31 @@ body.has-touch .minimap-wrap { bottom: auto; top: calc(66px + env(safe-area-inse
 }
 .intro-guest {
   margin-top: 22px;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: min(90vw, 560px);
+  width: 100%;
   font-size: clamp(14px, 2.4vw, 19px);
   letter-spacing: 0.12em;
   color: var(--gold);
   text-shadow: 0 0 22px rgba(255, 216, 138, 0.55);
   opacity: 0;
   animation: riseIn 1.4s ease 2.5s forwards;
+  overflow-wrap: anywhere;
+  word-break: break-word;
+  white-space: normal;
+  line-height: 1.45;
+  display: block;
+  box-sizing: border-box;
+  padding: 0 8px;
+  text-align: center;
 }
+.intro-guest-label { display: block; font-size: 0.85em; opacity: 0.95; margin-bottom: 6px; letter-spacing: 0.12em; }
+.intro-guest-name { display: block; font-size: 1.15em; font-weight: 700; line-height: 1.35; letter-spacing: 0.06em; color: #fff; text-shadow: 0 0 22px rgba(255, 216, 138, 0.55), 0 0 36px rgba(255,255,255,0.35); overflow-wrap: anywhere; word-break: break-word; }
+.intro-guest.long { font-size: clamp(12px, 2vw, 16px); letter-spacing: 0.08em; }
+.intro-guest.very-long { font-size: clamp(11px, 1.7vw, 14px); letter-spacing: 0.06em; }
+.intro-guest.long .intro-guest-name,
+.intro-guest.very-long .intro-guest-name { letter-spacing: 0.04em; }
 .launch-btn { margin-top: 44px; opacity: 0; animation: riseIn 1.2s ease 2.9s forwards, shimmer 3.2s ease infinite; }
 .launch-btn:disabled { filter: saturate(0.4); pointer-events: none; }
 .intro-hint { margin-top: 18px; font-size: 11.5px; letter-spacing: 0.14em; color: rgba(210, 200, 245, 0.4); opacity: 0; animation: riseIn 1.4s ease 3.4s forwards; }

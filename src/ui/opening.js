@@ -1,20 +1,32 @@
 import * as THREE from 'three';
 import { CONFIG } from '../config.js';
 import { state, emit } from '../core/state.js';
-import { GUEST_LINE } from '../core/guest.js';
+import { GUEST, GUEST_LINE } from '../core/guest.js';
 import { audio } from '../core/audio.js';
 import { cameraRig } from '../game/cameraRig.js';
+
+function escapeHtml(s) {
+  return s.replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+}
 
 export function runOpening({ rocket }) {
   const intro = document.getElementById('intro');
   const longName = (CONFIG.groom + CONFIG.bride).length > 18 ? ' long' : '';
+  let guestHtml = '';
+  if (GUEST) {
+    const len = GUEST.length;
+    const guestClass = len > 24 ? ' very-long' : len > 14 ? ' long' : '';
+    guestHtml = `<p class="intro-guest${guestClass}"><span class="intro-guest-label">Kepada Yth. <span aria-hidden="true">💖</span></span><span class="intro-guest-name">${escapeHtml(GUEST)}</span></p>`;
+  } else if (GUEST_LINE) {
+    guestHtml = `<p class="intro-guest">${escapeHtml(GUEST_LINE)}</p>`;
+  }
   intro.innerHTML = `
     <div class="intro-vignette"></div>
     <div class="intro-content">
       <div class="intro-eyebrow">WEDDING SPACE ODYSSEY</div>
       <h1 class="intro-title${longName}"><span>${CONFIG.groom.toUpperCase()}</span><i>&</i><span>${CONFIG.bride.toUpperCase()}</span></h1>
       <p class="intro-sub">${CONFIG.tagline}</p>
-      ${GUEST_LINE ? `<p class="intro-guest">${GUEST_LINE}</p>` : ''}
+      ${guestHtml}
       <button class="cta-btn launch-btn" id="launch-btn">🚀 LAUNCH OUR STORY</button>
       <p class="intro-hint">Best with sound · headphones recommended</p>
     </div>`;
