@@ -58,6 +58,42 @@ host: GitHub Pages, Netlify, Vercel, or a shared hosting panel.
 
 > `node_modules` is **not** required for hosting — Three.js is vendored locally in `libs/three.module.js`.
 
+## 💍 Versi undangan klasik (scroll) — `undangan/`
+
+Selain versi 3D, repo ini berisi **undangan digital klasik berbasis scroll** di folder
+[`undangan/`](undangan/index.html) dengan sentuhan mewah: sampul **pintu ganda** yang
+mereka perlahan, **kelopak & debu emas** melayang (canvas 2D), **ornamen emas yang
+menggambar dirinya** saat di-scroll, shimmer gradasi emas pada nama mempelai, jalur
+timeline emas yang terisi mengikuti scroll, bingkai foto couple bersudut emas, dan
+**langit malam berbintang** yang menyala di bagian penutup. Strukturnya tetap undangan
+klasik: sampul *"Kepada Yth. [nama tamu]"* → ayat, countdown, mempelai, rangkaian
+acara, galeri, hadiah, RSVP, ucapan, penutup. Musik latar prosedural + tombol mute
+tersedia. (Roket hanya ada di versi 3D.)
+
+- Preview lokal: `http://localhost:5173/undangan/` atau `/undangan/NamaTamu`
+- Konten diambil dari `src/config.js` yang sama (single source of truth) — field
+  tambahan khusus versi klasik: `greeting`, `verse`, `brideParents`, `groomParents`, `closingNote`.
+- Foto couple: set `CONFIG.couplePhoto` (saat ini `./assets/photos/photo-1.jpg`).
+
+### Deployment `undangan.adensahwaludin.app`
+
+`server.mjs` otomatis memilih halaman berdasarkan **Host**:
+
+| Host | Halaman |
+|---|---|
+| `undangan.*` (mis. `undangan.adensahwaludin.app`) | folder `undangan/` (klasik) |
+| host lain (`weeding.adensahwaludin.app`, dll.) | versi 3D |
+
+Cukup arahkan DNS `undangan.adensahwaludin.app` (A/CNAME) ke VPS yang sama dan
+proxy ke node server yang sama — **tanpa server/repo kedua**. Database SQLite,
+API, tracking, dan admin `/db` dipakai bersama. Nama tamu tetap via path:
+`https://undangan.adensahwaludin.app/NamaTamu`.
+
+> Catatan: `undangan/index.html` memakai aset bersama via path relatif `../src/…`,
+> `../libs/…` — jadi folder `undangan/` harus tetap satu pohon dengan `src/` & `libs/`
+> (seperti struktur repo ini). Jika suatu saat ingin di-deploy sebagai situs statis
+> terpisah, salin juga folder `src/` dan `libs/`.
+
 ## 🛰️ Link tamu, tracking & admin `/db`
 
 **Nama tamu via URL** — kirim link dengan nama tamu di path:

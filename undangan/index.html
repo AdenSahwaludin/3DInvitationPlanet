@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<meta name="theme-color" content="#fdfaf3" />
+<title>Aden &amp; Mega — Undangan Pernikahan</title>
+<meta name="description" content="Undangan pernikahan Aden & Mega. Dengan memohon rahmat dan ridha Allah SWT, kami mengundang Bapak/Ibu/Saudara/i untuk hadir di hari bahagia kami." />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;500;600&family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Great+Vibes&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='0.9em' font-size='90'>💍</text></svg>" />
+<link rel="stylesheet" href="./styles.css" />
+</head>
+<body class="locked">
+
+<div id="sky-backdrop" aria-hidden="true"></div>
+<canvas id="fx-canvas" aria-hidden="true"></canvas>
+<div id="page-frame" aria-hidden="true"></div>
+<div id="scroll-progress" aria-hidden="true"></div>
+
+<!-- ===== Sampul / Cover (pintu ganda) ===== -->
+<div id="cover">
+  <div class="door door-l" aria-hidden="true"><i></i></div>
+  <div class="door door-r" aria-hidden="true"><i></i></div>
+
+  <div class="cover-card">
+    <svg class="ornament light" viewBox="0 0 260 24" aria-hidden="true">
+      <path pathLength="1" d="M8 12 H104"/><path pathLength="1" d="M156 12 H252"/>
+      <path pathLength="1" d="M104 12 Q117 1 130 12 Q117 23 104 12 Z"/>
+      <path pathLength="1" d="M156 12 Q143 1 130 12 Q143 23 156 12 Z"/>
+      <path pathLength="1" d="M130 7.5 L134.5 12 L130 16.5 L125.5 12 Z"/>
+    </svg>
+    <p class="kicker" id="cover-kicker">The Wedding Of</p>
+    <h1 class="script cover-names" id="cover-names">Aden <span>&amp;</span> Mega</h1>
+    <p class="cover-date" id="cover-date">· 18 · 10 · 2026 ·</p>
+    <div class="cover-guest">
+      <p class="cover-guest-label">Kepada Yth.</p>
+      <p class="cover-guest-name" id="cover-guest-name">Bapak/Ibu/Saudara/i</p>
+      <p class="cover-guest-label">di Tempat</p>
+    </div>
+    <button id="open-invite" class="btn btn-gold">
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><rect x="2.5" y="5" width="19" height="14" rx="2.5"/><path d="M3 6.5l9 6.5 9-6.5"/></svg>
+      Buka Undangan
+    </button>
+  </div>
+  <div class="cover-stars" aria-hidden="true"></div>
+</div>
+
+<main id="content">
+
+  <!-- ===== Hero ===== -->
+  <section id="hero" class="section hero">
+    <p class="greeting reveal" id="hero-greeting">Assalamu’alaikum Warahmatullahi Wabarakatuh</p>
+    <p class="kicker reveal" id="hero-kicker">Undangan Pernikahan</p>
+    <h2 class="script hero-names reveal" id="hero-names">Aden <span>&amp;</span> Mega</h2>
+    <svg class="ornament reveal" viewBox="0 0 260 24" aria-hidden="true">
+      <path pathLength="1" d="M8 12 H104"/><path pathLength="1" d="M156 12 H252"/>
+      <path pathLength="1" d="M104 12 Q117 1 130 12 Q117 23 104 12 Z"/>
+      <path pathLength="1" d="M156 12 Q143 1 130 12 Q143 23 156 12 Z"/>
+      <path pathLength="1" d="M130 7.5 L134.5 12 L130 16.5 L125.5 12 Z"/>
+    </svg>
+    <p class="hero-date reveal" id="hero-date">Minggu, 18 Oktober 2026</p>
+    <p class="hero-tagline reveal" id="hero-tagline">A Journey Written Among The Stars</p>
+    <div class="scroll-hint" aria-hidden="true">
+      <span>Scroll</span>
+      <i></i>
+    </div>
+  </section>
+
+  <!-- ===== Ayat ===== -->
+  <section id="ayat" class="section alt">
+    <div class="container narrow">
+      <div class="panel-frame reveal">
+        <svg class="ornament" viewBox="0 0 260 24" aria-hidden="true">
+          <path pathLength="1" d="M8 12 H104"/><path pathLength="1" d="M156 12 H252"/>
+          <path pathLength="1" d="M104 12 Q117 1 130 12 Q117 23 104 12 Z"/>
+          <path pathLength="1" d="M156 12 Q143 1 130 12 Q143 23 156 12 Z"/>
+          <path pathLength="1" d="M130 7.5 L134.5 12 L130 16.5 L125.5 12 Z"/>
+        </svg>
+        <p class="verse-text" id="verse-text"></p>
+        <p class="verse-source" id="verse-source"></p>
+        <svg class="ornament flip" viewBox="0 0 260 24" aria-hidden="true">
+          <path pathLength="1" d="M8 12 H104"/><path pathLength="1" d="M156 12 H252"/>
+          <path pathLength="1" d="M104 12 Q117 1 130 12 Q117 23 104 12 Z"/>
+          <path pathLength="1" d="M156 12 Q143 1 130 12 Q143 23 156 12 Z"/>
+          <path pathLength="1" d="M130 7.5 L134.5 12 L130 16.5 L125.5 12 Z"/>
+        </svg>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Countdown ===== -->
+  <section id="hitung-mundur" class="section">
+    <div class="container narrow center">
+      <p class="kicker reveal">Menuju Hari Bahagia</p>
+      <h2 class="section-title reveal">Menghitung Detik</h2>
+      <div class="countdown reveal" id="countdown"></div>
+      <a class="btn btn-line reveal" id="calendar-btn" target="_blank" rel="noopener">Simpan Tanggal</a>
+    </div>
+  </section>
+
+  <!-- ===== Mempelai ===== -->
+  <section id="mempelai" class="section alt">
+    <div class="container narrow center">
+      <p class="kicker reveal">Mempelai</p>
+      <h2 class="section-title reveal">Dua Insan, Satu Semesta</h2>
+      <p class="section-sub reveal" id="mempelai-intro">Dengan memohon rahmat dan ridha Allah SWT, kami bermaksud menyelenggarakan pernikahan kami:</p>
+
+      <div class="couple-frame reveal">
+        <div class="frame-inner" id="couple-photo" role="img" aria-label="Foto Aden &amp; Mega"></div>
+      </div>
+
+      <div class="person reveal">
+        <div class="person-photo" id="groom-photo"></div>
+        <p class="person-role">Mempelai Pria</p>
+        <h3 class="script person-name" id="groom-name"></h3>
+        <p class="person-parents" id="groom-parents"></p>
+      </div>
+
+      <p class="amp script reveal">&amp;</p>
+
+      <div class="person reveal">
+        <div class="person-photo" id="bride-photo"></div>
+        <p class="person-role">Mempelai Wanita</p>
+        <h3 class="script person-name" id="bride-name"></h3>
+        <p class="person-parents" id="bride-parents"></p>
+      </div>
+
+      <p class="quote reveal" id="couple-quote"></p>
+    </div>
+  </section>
+
+  <!-- ===== Cerita ===== -->
+  <section id="cerita" class="section">
+    <div class="container">
+      <p class="kicker center reveal">Perjalanan Kami</p>
+      <h2 class="section-title center reveal">Kisah di Antara Bintang</h2>
+      <p class="section-sub center reveal">Setiap tahun menuliskan ceritanya sendiri — inilah perjalanan yang membawa kami sampai di hari ini.</p>
+      <div class="timeline" id="timeline">
+        <div class="timeline-track" aria-hidden="true"></div>
+        <div class="timeline-fill" id="timeline-fill" aria-hidden="true"></div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Rangkaian Acara ===== -->
+  <section id="acara" class="section alt">
+    <div class="container">
+      <p class="kicker center reveal">Rangkaian Acara</p>
+      <h2 class="section-title center reveal">Hari Bahagia</h2>
+      <svg class="ornament center-orn reveal" viewBox="0 0 260 24" aria-hidden="true">
+        <path pathLength="1" d="M8 12 H104"/><path pathLength="1" d="M156 12 H252"/>
+        <path pathLength="1" d="M104 12 Q117 1 130 12 Q117 23 104 12 Z"/>
+        <path pathLength="1" d="M156 12 Q143 1 130 12 Q143 23 156 12 Z"/>
+        <path pathLength="1" d="M130 7.5 L134.5 12 L130 16.5 L125.5 12 Z"/>
+      </svg>
+      <div class="event-grid" id="event-grid"></div>
+      <div class="venue-card reveal">
+        <p class="venue-name" id="venue-name"></p>
+        <p class="venue-address" id="venue-address"></p>
+        <div class="btn-row">
+          <a class="btn btn-navy" id="maps-btn" target="_blank" rel="noopener">
+            <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s7-5.1 7-11a7 7 0 1 0-14 0c0 5.9 7 11 7 11z"/><circle cx="12" cy="10" r="2.6"/></svg>
+            Buka Google Maps
+          </a>
+          <a class="btn btn-line" id="calendar-btn-2" target="_blank" rel="noopener">Simpan ke Kalender</a>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ===== Galeri ===== -->
+  <section id="galeri" class="section">
+    <div class="container">
+      <p class="kicker center reveal">Galeri</p>
+      <h2 class="section-title center reveal">Momen yang Tersimpan</h2>
+      <svg class="ornament center-orn reveal" viewBox="0 0 260 24" aria-hidden="true">
+        <path pathLength="1" d="M8 12 H104"/><path pathLength="1" d="M156 12 H252"/>
+        <path pathLength="1" d="M104 12 Q117 1 130 12 Q117 23 104 12 Z"/>
+        <path pathLength="1" d="M156 12 Q143 1 130 12 Q143 23 156 12 Z"/>
+        <path pathLength="1" d="M130 7.5 L134.5 12 L130 16.5 L125.5 12 Z"/>
+      </svg>
+      <div class="gallery" id="gallery"></div>
+    </div>
+  </section>
+
+  <!-- ===== Hadiah ===== -->
+  <section id="hadiah" class="section alt">
+    <div class="container narrow">
+      <p class="kicker center reveal">Wedding Gift</p>
+      <h2 class="section-title center reveal">Tanda Kasih</h2>
+      <p class="section-sub center reveal" id="gift-note"></p>
+      <div class="gift-grid" id="gift-grid"></div>
+      <p class="gift-address reveal" id="gift-address"></p>
+    </div>
+  </section>
+
+  <!-- ===== RSVP ===== -->
+  <section id="rsvp" class="section">
+    <div class="container narrow">
+      <p class="kicker center reveal">Konfirmasi Kehadiran</p>
+      <h2 class="section-title center reveal">RSVP</h2>
+      <p class="section-sub center reveal">Mohon konfirmasi kehadiran Anda untuk membantu kami mempersiapkan acara dengan baik.</p>
+      <form id="rsvp-form" class="card form reveal">
+        <label class="field">
+          <span>Nama</span>
+          <input type="text" name="name" id="rsvp-name" required maxlength="60" placeholder="Nama Anda" />
+        </label>
+        <div class="field">
+          <span>Kehadiran</span>
+          <div class="segmented" id="rsvp-attend">
+            <label><input type="radio" name="attending" value="1" checked /><span>Hadir</span></label>
+            <label><input type="radio" name="attending" value="0" /><span>Berhalangan</span></label>
+          </div>
+        </div>
+        <label class="field">
+          <span>Jumlah Tamu</span>
+          <select name="guests" id="rsvp-guests">
+            <option value="1">1 orang</option>
+            <option value="2">2 orang</option>
+            <option value="3">3 orang</option>
+            <option value="4">4 orang</option>
+            <option value="5">5 orang</option>
+          </select>
+        </label>
+        <button type="submit" class="btn btn-gold" id="rsvp-submit">Kirim Konfirmasi</button>
+        <p class="form-ok hidden" id="rsvp-ok">Terima kasih! Konfirmasi Anda telah tersimpan. 🌟</p>
+      </form>
+    </div>
+  </section>
+
+  <!-- ===== Ucapan ===== -->
+  <section id="ucapan" class="section alt">
+    <div class="container narrow">
+      <p class="kicker center reveal">Ucapan &amp; Doa</p>
+      <h2 class="section-title center reveal">Kirimkan Doa Terbaik</h2>
+      <form id="wish-form" class="card form reveal">
+        <label class="field">
+          <span>Nama</span>
+          <input type="text" name="name" id="wish-name" required maxlength="60" placeholder="Nama Anda" />
+        </label>
+        <label class="field">
+          <span>Ucapan</span>
+          <textarea name="message" id="wish-message" rows="3" required maxlength="500" placeholder="Tuliskan ucapan dan doa terbaik Anda..."></textarea>
+        </label>
+        <button type="submit" class="btn btn-gold" id="wish-submit">Kirim Ucapan</button>
+      </form>
+      <div class="wish-list" id="wish-list"></div>
+    </div>
+  </section>
+
+  <!-- ===== Penutup ===== -->
+  <section id="penutup" class="section finale">
+    <div class="container narrow center">
+      <svg class="ornament light reveal" viewBox="0 0 260 24" aria-hidden="true">
+        <path pathLength="1" d="M8 12 H104"/><path pathLength="1" d="M156 12 H252"/>
+        <path pathLength="1" d="M104 12 Q117 1 130 12 Q117 23 104 12 Z"/>
+        <path pathLength="1" d="M156 12 Q143 1 130 12 Q143 23 156 12 Z"/>
+        <path pathLength="1" d="M130 7.5 L134.5 12 L130 16.5 L125.5 12 Z"/>
+      </svg>
+      <p class="finale-greeting reveal" id="closing-greeting">Wassalamu’alaikum Warahmatullahi Wabarakatuh</p>
+      <p class="finale-note reveal" id="closing-note"></p>
+      <p class="finale-love reveal">Kami yang berbahagia,</p>
+      <h2 class="script finale-names reveal" id="finale-names"></h2>
+      <p class="finale-date reveal" id="finale-date"></p>
+      <p class="finale-quote reveal" id="finale-quote"></p>
+      <p class="finale-hashtag reveal" id="finale-hashtag"></p>
+    </div>
+    <footer class="footer">Dibuat dengan ♥ di antara bintang</footer>
+  </section>
+
+</main>
+
+<button id="music-toggle" aria-label="Putar / matikan musik" title="Musik">♪</button>
+<div id="toast" role="status"></div>
+<div id="lightbox" class="hidden">
+  <button id="lightbox-close" aria-label="Tutup">✕</button>
+  <figure>
+    <img id="lightbox-img" alt="" />
+    <figcaption id="lightbox-caption"></figcaption>
+  </figure>
+</div>
+
+<script type="module" src="./app.js"></script>
+</body>
+</html>

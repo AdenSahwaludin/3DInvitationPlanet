@@ -257,21 +257,40 @@ const server = http.createServer(async (req, res) => {
       return res.end(data);
     }
 
-    const rawPath = decodeURIComponent(url.pathname);
+    // —— Undangan klasik (versi scroll) ——
+    // Domain berawalan "undangan." (mis. undangan.adensahwaludin.app) membuka
+    // folder undangan/ ; /src, /libs, /assets tetap diambil dari root repo.
+    // Di domain lain, folder ini juga bisa dibuka lewat path /undangan.
+    const host = String(req.headers.host || '').split(':')[0].toLowerCase();
+    const undanganHost = host.startsWith('undangan.');
+    let rawPath = decodeURIComponent(url.pathname);
+    let serveDir = root;
+    if (!undanganHost && (rawPath === '/undangan' || rawPath.startsWith('/undangan/'))) {
+      rawPath = rawPath === '/undangan' ? '/' : rawPath.slice('/undangan'.length) || '/';
+      serveDir = path.join(root, 'undangan');
+    }
+    if (undanganHost) serveDir = path.join(root, 'undangan');
+
     const isDoc = rawPath === '/' || rawPath === '';
-    const file = path.normalize(path.join(root, isDoc ? 'index.html' : rawPath));
-    if (!file.startsWith(root)) {
+    const rel = isDoc ? 'index.html' : rawPath.slice(1);
+    const docFile = serveDir === root ? 'index.html' : path.join('undangan', 'index.html');
+    let file = path.normalize(path.join(serveDir, rel));
+    if (!file.startsWith(serveDir) && !file.startsWith(root)) {
       res.writeHead(403);
       return res.end('Forbidden');
     }
     let data;
-    let typePath = isDoc ? 'index.html' : rawPath;
+    let typePath = rel;
     try {
       data = await fs.readFile(file);
     } catch {
-      if (!path.extname(rawPath)) {
-        data = await fs.readFile(path.join(root, 'index.html'));
-        typePath = 'index.html';
+      if (!path.extname(rel)) {
+        data = await fs.readFile(path.join(root, docFile));
+        typePath = docFile;
+      } else if (serveDir !== root) {
+        // aset bersama (src/, libs/, assets/) tetap dari root repo
+        file = path.normalize(path.join(root, rel));
+        data = await fs.readFile(file);
       } else {
         throw new Error('not found');
       }

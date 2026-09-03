@@ -1,5 +1,3 @@
-import * as THREE from 'three';
-
 const WEDDING_DATE = '2026-10-18T08:00:00+07:00';
 
 export const CONFIG = {
@@ -10,7 +8,16 @@ export const CONFIG = {
   hashtag: "#i'AM-AmongTheStars",
   weddingDate: WEDDING_DATE,
   quote: 'Two souls, one universe.',
-  couplePhoto: '',
+  couplePhoto: './assets/photos/photo-1.jpg',
+  // —— Tambahan khusus undangan klasik (versi scroll, folder /undangan) ——
+  greeting: 'Assalamu’alaikum Warahmatullahi Wabarakatuh',
+  verse: {
+    text: 'Dan di antara tanda-tanda kebesaran-Nya ialah Dia menciptakan pasangan-pasangan untukmu dari jenismu sendiri, agar kamu cenderung dan merasa tenteram kepadanya, dan Dia menjadikan di antaramu rasa kasih dan sayang.',
+    source: 'QS. Ar-Rum : 21'
+  },
+  brideParents: 'Putri dari Bapak … & Ibu …',
+  groomParents: 'Putra dari Bapak … & Ibu …',
+  closingNote: 'Merupakan suatu kehormatan dan kebahagiaan bagi kami apabila Bapak/Ibu/Saudara/i berkenan hadir dan memberikan doa restu kepada kami.',
   story: [
     { year: '2016', title: 'Awal Kenal', icon: '✨', text: 'Kisah kami berawal di tahun 2016, perkenalan sederhana yang membuka lembaran awal perjalanan penuh cerita.' },
     { year: '2022', title: 'Pertama Bertemu', icon: '☕', text: 'Semesta mempertemukan kami secara langsung. Momen tatap muka dan obrolan hangat yang meyakinkan langkah kami bersama.' },

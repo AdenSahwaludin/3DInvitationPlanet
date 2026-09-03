@@ -1,8 +1,10 @@
-const RESERVED = new Set(['db', 'api', 'assets', 'src', 'libs', 'data', 'index.html', 'admin.html', 'favicon.ico', 'robots.txt']);
+const RESERVED = new Set(['undangan', 'db', 'api', 'assets', 'src', 'libs', 'data', 'index.html', 'admin.html', 'favicon.ico', 'robots.txt']);
 
 function parse() {
   try {
-    const seg = location.pathname.split('/').filter(Boolean);
+    let seg = location.pathname.split('/').filter(Boolean);
+    // preview undangan klasik via path: /undangan/NamaTamu
+    if (seg.length && seg[0].toLowerCase() === 'undangan') seg = seg.slice(1);
     if (!seg.length) return '';
     const first = decodeURIComponent(seg[0]).trim();
     if (!first || first.length > 32) return '';
