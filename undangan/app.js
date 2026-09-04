@@ -4,6 +4,7 @@ import { CONFIG, DATE_DOT } from '../src/config.js';
 import { GUEST } from '../src/core/guest.js';
 import { api } from '../src/core/api.js';
 import { initFx } from './fx.js';
+import { initFlora } from './flora.js';
 import { MusicBox } from './audio.js';
 
 const $ = id => document.getElementById(id);
@@ -25,7 +26,10 @@ $('hero-greeting').textContent = CONFIG.greeting || '';
 $('hero-names').innerHTML = `${esc(CONFIG.groom)} <span>&amp;</span> ${esc(CONFIG.bride)}`;
 $('hero-date').textContent = fmtDate;
 $('hero-tagline').textContent = CONFIG.tagline || '';
+$('countdown-date').textContent = fmtDate;
 document.title = `${CONFIG.couple} — Undangan Pernikahan`;
+
+initFlora();
 
 if (CONFIG.verse?.text) {
   $('verse-text').textContent = `“${CONFIG.verse.text}”`;
